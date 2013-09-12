@@ -6,22 +6,13 @@ else
   begin; require 'rubygems'; rescue ::Exception; end
 end
 
-
-
 require 'daemons'
 
 
 options = {
-  :log_output => true
+  :multiple => true,
+  :monitor => true,
+  :log_output => true,
 }
 
-
-testfile = File.expand_path(__FILE__) + '.txt'
-
-Daemons.daemonize(options)
-
-puts "some output..."
-
-File.open(testfile, 'w') {|f|
-  f.write("test")
-}
+Daemons.run(File.join(File.dirname(__FILE__), 'myserver_crashing.rb'), options)

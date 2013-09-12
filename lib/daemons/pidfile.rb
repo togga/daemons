@@ -76,7 +76,7 @@ module Daemons
           @number += 1
         end
         
-        if @number == 1024
+        if @number >= 1024
           raise RuntimeException('cannot run more than 1024 instances of the application')
         end
       end
@@ -92,6 +92,7 @@ module Daemons
     
     def pid=(p)
       File.open(filename, 'w') {|f|
+        f.chmod(0644)
         f.puts p   #Process.pid
       }
     end
@@ -101,9 +102,13 @@ module Daemons
     end
 
     def pid
-      File.open(filename) {|f|
-        return f.gets.to_i
-      }
+      begin
+        File.open(filename) {|f|
+          return f.gets.to_i
+        }
+      rescue ::Exception
+        return nil
+      end
     end
 
   end

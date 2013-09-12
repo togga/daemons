@@ -1,13 +1,4 @@
-WINDOWS  = RUBY_PLATFORM.match(/(win|w)32$/)
-ONE_NINE = RUBY_VERSION >= "1.9"
-if WINDOWS
-  if ONE_NINE
-    require 'open3'
-  else
-    require 'rubygems'
-    require 'win32/open3'
-  end
-end
+require 'daemons/exceptions'
 
 
 module Daemons
@@ -15,6 +6,8 @@ module Daemons
   class Pid
   
     def Pid.running?(pid)
+      return false unless pid
+      
       # Check if process is in existence
       # The simplest way to do this is to send signal '0'
       # (which is a single system call) that doesn't actually
@@ -22,6 +15,8 @@ module Daemons
       begin
         Process.kill(0, pid)
         return true
+      rescue TimeoutError
+        raise
       rescue Errno::ESRCH
         return false
       rescue ::Exception   # for example on EPERM (process exists but does not belong to us)
@@ -56,6 +51,7 @@ module Daemons
   #     
   #    return got_match
   #  end
+    
     
     
     # Returns the directory that should be used to write the pid file to
@@ -95,11 +91,16 @@ module Daemons
     def pid=(p)
     end
     
+    # Check whether the process is running
+    def running?
+      return Pid.running?(pid())
+    end
+    
     # Cleanup method
     def cleanup
     end
     
-    # Exists? method
+    # Exist? method
     def exist?
       true
     end

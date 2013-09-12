@@ -6,22 +6,14 @@ else
   begin; require 'rubygems'; rescue ::Exception; end
 end
 
-
-
 require 'daemons'
 
-
 options = {
-  :log_output => true
+  #:mode => :exec,
+  :multiple => true,
+  :no_pidfiles => true,
+  :force_kill_waittime => 5
+  #:force_kill_waittime => -1    # do not wait before killing -9
 }
 
-
-testfile = File.expand_path(__FILE__) + '.txt'
-
-Daemons.daemonize(options)
-
-puts "some output..."
-
-File.open(testfile, 'w') {|f|
-  f.write("test")
-}
+Daemons.run(File.join(File.dirname(__FILE__), 'myserver_hanging.rb'), options)
