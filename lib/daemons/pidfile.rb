@@ -34,8 +34,10 @@ module Daemons
     attr_reader :dir, :progname, :multiple, :number
 
     def PidFile.find_files(dir, progname, delete = false)
-      files = Dir[File.join(dir, "#{progname}*.pid")]
-      
+      files = Dir[File.join(dir, "#{progname}*.pid")].select {|f|
+        f =~ /#{progname}\d*\.pid/
+      }
+
       files.delete_if {|f| not (File.file?(f) and File.readable?(f))}
       if delete 
         files.delete_if do |f|
